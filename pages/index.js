@@ -16,6 +16,8 @@ export default function Home() {
   const [error, setError] = useState(null);
   const [selectedSymbol, setSelectedSymbol] = useState(null);
   const [selectedSymbolName, setSelectedSymbolName] = useState(null);
+  const [webhookLoading, setWebhookLoading] = useState(false);
+  const [webhookMessage, setWebhookMessage] = useState(null);
 
   useEffect(() => {
     // Check if user is logged in
@@ -71,6 +73,36 @@ export default function Home() {
   const handleLogout = () => {
     localStorage.removeItem('user');
     router.push('/login');
+  };
+
+  const triggerWebhook = async () => {
+    setWebhookLoading(true);
+    setWebhookMessage(null);
+
+    try {
+      const response = await fetch('/api/trigger-webhook', {
+        method: 'POST'
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        setWebhookMessage({ type: 'success', text: 'Market check triggered successfully!' });
+        // Refresh data after webhook
+        setTimeout(() => {
+          fetchMarketData();
+          fetchTradingSignals();
+        }, 2000);
+      } else {
+        setWebhookMessage({ type: 'error', text: data.error || 'Failed to trigger webhook' });
+      }
+    } catch (err) {
+      setWebhookMessage({ type: 'error', text: 'Failed to trigger webhook' });
+      console.error(err);
+    } finally {
+      setWebhookLoading(false);
+      // Clear message after 5 seconds
+      setTimeout(() => setWebhookMessage(null), 5000);
+    }
   };
 
   // Don't render dashboard until user is verified
@@ -168,6 +200,38 @@ export default function Home() {
               </p>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <button
+                onClick={triggerWebhook}
+                disabled={webhookLoading}
+                style={{
+                  padding: '10px 20px',
+                  borderRadius: '8px',
+                  border: '2px solid #10b981',
+                  background: webhookLoading ? '#64748b' : 'transparent',
+                  color: webhookLoading ? '#fff' : '#10b981',
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                  cursor: webhookLoading ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+                onMouseEnter={(e) => {
+                  if (!webhookLoading) {
+                    e.currentTarget.style.background = '#10b981';
+                    e.currentTarget.style.color = '#fff';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!webhookLoading) {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.color = '#10b981';
+                  }
+                }}
+              >
+                {webhookLoading ? '⏳ Checking...' : '🔄 Check Market'}
+              </button>
               <div style={{ textAlign: 'right' }}>
                 <div style={{ fontSize: '12px', opacity: 0.6 }}>Logged in as</div>
                 <div style={{ fontSize: '14px', fontWeight: 'bold' }}>{user.email}</div>
@@ -199,6 +263,25 @@ export default function Home() {
               </button>
             </div>
           </div>
+
+          {/* Webhook Status Message */}
+          {webhookMessage && (
+            <div style={{
+              background: webhookMessage.type === 'success' 
+                ? 'rgba(16, 185, 129, 0.1)' 
+                : 'rgba(239, 68, 68, 0.1)',
+              border: `2px solid ${webhookMessage.type === 'success' ? '#10b981' : '#ef4444'}`,
+              borderRadius: '8px',
+              padding: '12px 16px',
+              marginTop: '16px',
+              color: webhookMessage.type === 'success' ? '#10b981' : '#ef4444',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              textAlign: 'center'
+            }}>
+              {webhookMessage.text}
+            </div>
+          )}
         </div>
 
         {/* Trading Signals */}
