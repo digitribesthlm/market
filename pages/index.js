@@ -20,6 +20,7 @@ export default function Home() {
   const [webhookMessage, setWebhookMessage] = useState(null);
   const [stockAnalysisLoading, setStockAnalysisLoading] = useState(false);
   const [stockAnalysisMessage, setStockAnalysisMessage] = useState(null);
+  const [expandedSignal, setExpandedSignal] = useState(null);
 
   useEffect(() => {
     // Check if user is logged in
@@ -394,7 +395,7 @@ export default function Home() {
                 ...signal,
                 allSignals: [...signal.signals],
                 count: 1,
-                timestamps: [signal.timestamp]
+                allEntries: [signal] // Store all original entries
               };
             } else {
               // Merge signals and update if this one is newer
@@ -415,7 +416,7 @@ export default function Home() {
               }
               
               acc[symbol].count++;
-              acc[symbol].timestamps.push(signal.timestamp);
+              acc[symbol].allEntries.push(signal);
             }
             return acc;
           }, {});
@@ -424,7 +425,11 @@ export default function Home() {
           const mergedSignals = Object.values(groupedSignals)
             .map(signal => ({
               ...signal,
-              signals: signal.allSignals
+              signals: signal.allSignals,
+              // Sort all entries chronologically (newest first)
+              allEntries: signal.allEntries.sort((a, b) => 
+                new Date(b.timestamp) - new Date(a.timestamp)
+              )
             }))
             .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
@@ -439,7 +444,14 @@ export default function Home() {
                 gap: '20px'
               }}>
                 {mergedSignals.map((signal, idx) => (
-                  <TradingSignalCard key={signal.symbol} signal={signal} />
+                  <TradingSignalCard 
+                    key={signal.symbol} 
+                    signal={signal}
+                    isExpanded={expandedSignal === signal.symbol}
+                    onToggle={() => setExpandedSignal(
+                      expandedSignal === signal.symbol ? null : signal.symbol
+                    )}
+                  />
                 ))}
               </div>
             </div>
