@@ -18,6 +18,8 @@ export default function Home() {
   const [selectedSymbolName, setSelectedSymbolName] = useState(null);
   const [webhookLoading, setWebhookLoading] = useState(false);
   const [webhookMessage, setWebhookMessage] = useState(null);
+  const [stockAnalysisLoading, setStockAnalysisLoading] = useState(false);
+  const [stockAnalysisMessage, setStockAnalysisMessage] = useState(null);
 
   useEffect(() => {
     // Check if user is logged in
@@ -102,6 +104,35 @@ export default function Home() {
       setWebhookLoading(false);
       // Clear message after 5 seconds
       setTimeout(() => setWebhookMessage(null), 5000);
+    }
+  };
+
+  const triggerStockAnalysis = async () => {
+    setStockAnalysisLoading(true);
+    setStockAnalysisMessage(null);
+
+    try {
+      const response = await fetch('/api/trigger-stock-analysis', {
+        method: 'POST'
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        setStockAnalysisMessage({ type: 'success', text: 'Stock analysis triggered successfully!' });
+        // Refresh data after webhook
+        setTimeout(() => {
+          fetchTradingSignals();
+        }, 2000);
+      } else {
+        setStockAnalysisMessage({ type: 'error', text: data.error || 'Failed to trigger stock analysis' });
+      }
+    } catch (err) {
+      setStockAnalysisMessage({ type: 'error', text: 'Failed to trigger stock analysis' });
+      console.error(err);
+    } finally {
+      setStockAnalysisLoading(false);
+      // Clear message after 5 seconds
+      setTimeout(() => setStockAnalysisMessage(null), 5000);
     }
   };
 
@@ -213,22 +244,22 @@ export default function Home() {
               onClick={triggerWebhook}
               disabled={webhookLoading}
               style={{
-                padding: '12px 24px',
+                padding: '12px 20px',
                 borderRadius: '8px',
                 border: '2px solid #10b981',
                 background: webhookLoading ? '#64748b' : '#10b981',
                 color: '#fff',
-                fontSize: '16px',
+                fontSize: '15px',
                 fontWeight: 'bold',
                 cursor: webhookLoading ? 'not-allowed' : 'pointer',
                 transition: 'all 0.2s',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
+                gap: '6px',
                 boxShadow: webhookLoading ? 'none' : '0 4px 12px rgba(16, 185, 129, 0.4)',
                 flex: '1 1 auto',
-                minWidth: '160px',
-                maxWidth: '240px',
+                minWidth: '140px',
+                maxWidth: '200px',
                 justifyContent: 'center'
               }}
               onMouseEnter={(e) => {
@@ -243,6 +274,42 @@ export default function Home() {
               }}
             >
               {webhookLoading ? '⏳ Checking...' : '🔄 Check Market'}
+            </button>
+
+            <button
+              onClick={triggerStockAnalysis}
+              disabled={stockAnalysisLoading}
+              style={{
+                padding: '12px 20px',
+                borderRadius: '8px',
+                border: '2px solid #3b82f6',
+                background: stockAnalysisLoading ? '#64748b' : '#3b82f6',
+                color: '#fff',
+                fontSize: '15px',
+                fontWeight: 'bold',
+                cursor: stockAnalysisLoading ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                boxShadow: stockAnalysisLoading ? 'none' : '0 4px 12px rgba(59, 130, 246, 0.4)',
+                flex: '1 1 auto',
+                minWidth: '140px',
+                maxWidth: '200px',
+                justifyContent: 'center'
+              }}
+              onMouseEnter={(e) => {
+                if (!stockAnalysisLoading) {
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!stockAnalysisLoading) {
+                  e.currentTarget.style.transform = 'scale(1)';
+                }
+              }}
+            >
+              {stockAnalysisLoading ? '⏳ Analyzing...' : '📊 Analyze Stocks'}
             </button>
 
             <button
@@ -280,7 +347,7 @@ export default function Home() {
             <span style={{ color: '#3b82f6', fontWeight: 'bold' }}>{user.role}</span>
           </div>
 
-          {/* Webhook Status Message */}
+          {/* Webhook Status Messages */}
           {webhookMessage && (
             <div style={{
               background: webhookMessage.type === 'success' 
@@ -296,6 +363,23 @@ export default function Home() {
               textAlign: 'center'
             }}>
               {webhookMessage.text}
+            </div>
+          )}
+          {stockAnalysisMessage && (
+            <div style={{
+              background: stockAnalysisMessage.type === 'success' 
+                ? 'rgba(59, 130, 246, 0.1)' 
+                : 'rgba(239, 68, 68, 0.1)',
+              border: `2px solid ${stockAnalysisMessage.type === 'success' ? '#3b82f6' : '#ef4444'}`,
+              borderRadius: '8px',
+              padding: '12px 16px',
+              marginTop: '16px',
+              color: stockAnalysisMessage.type === 'success' ? '#3b82f6' : '#ef4444',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              textAlign: 'center'
+            }}>
+              {stockAnalysisMessage.text}
             </div>
           )}
         </div>
