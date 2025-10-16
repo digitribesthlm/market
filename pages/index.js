@@ -186,82 +186,98 @@ export default function Home() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', padding: '40px 20px' }}>
+    <div style={{ minHeight: '100vh', padding: '16px' }}>
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
         {/* Header */}
-        <div style={{ marginBottom: '40px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <div style={{ textAlign: 'center', flex: 1 }}>
-              <h1 style={{ fontSize: '48px', fontWeight: 'bold', marginBottom: '8px' }}>
-                Market Analysis Dashboard
-              </h1>
-              <p style={{ fontSize: '18px', opacity: 0.7 }}>
-                Last updated: {new Date(latestData.timestamp).toLocaleString()}
-              </p>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <button
-                onClick={triggerWebhook}
-                disabled={webhookLoading}
-                style={{
-                  padding: '10px 20px',
-                  borderRadius: '8px',
-                  border: '2px solid #10b981',
-                  background: webhookLoading ? '#64748b' : 'transparent',
-                  color: webhookLoading ? '#fff' : '#10b981',
-                  fontSize: '14px',
-                  fontWeight: 'bold',
-                  cursor: webhookLoading ? 'not-allowed' : 'pointer',
-                  transition: 'all 0.2s',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-                onMouseEnter={(e) => {
-                  if (!webhookLoading) {
-                    e.currentTarget.style.background = '#10b981';
-                    e.currentTarget.style.color = '#fff';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!webhookLoading) {
-                    e.currentTarget.style.background = 'transparent';
-                    e.currentTarget.style.color = '#10b981';
-                  }
-                }}
-              >
-                {webhookLoading ? '⏳ Checking...' : '🔄 Check Market'}
-              </button>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '12px', opacity: 0.6 }}>Logged in as</div>
-                <div style={{ fontSize: '14px', fontWeight: 'bold' }}>{user.email}</div>
-                <div style={{ fontSize: '12px', opacity: 0.7, color: '#3b82f6' }}>{user.role}</div>
-              </div>
-              <button
-                onClick={handleLogout}
-                style={{
-                  padding: '10px 20px',
-                  borderRadius: '8px',
-                  border: '2px solid #ef4444',
-                  background: 'transparent',
-                  color: '#ef4444',
-                  fontSize: '14px',
-                  fontWeight: 'bold',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = '#ef4444';
-                  e.currentTarget.style.color = '#fff';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'transparent';
-                  e.currentTarget.style.color = '#ef4444';
-                }}
-              >
-                Logout
-              </button>
-            </div>
+        <div style={{ marginBottom: '32px' }}>
+          {/* Title */}
+          <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+            <h1 style={{ fontSize: 'clamp(24px, 6vw, 48px)', fontWeight: 'bold', marginBottom: '8px' }}>
+              Market Analysis Dashboard
+            </h1>
+            <p style={{ fontSize: 'clamp(12px, 3vw, 18px)', opacity: 0.7 }}>
+              Last updated: {new Date(latestData.timestamp).toLocaleString()}
+            </p>
+          </div>
+
+          {/* Actions Row */}
+          <div style={{ 
+            display: 'flex', 
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            alignItems: 'center', 
+            gap: '12px',
+            marginBottom: '16px'
+          }}>
+            <button
+              onClick={triggerWebhook}
+              disabled={webhookLoading}
+              style={{
+                padding: '12px 24px',
+                borderRadius: '8px',
+                border: '2px solid #10b981',
+                background: webhookLoading ? '#64748b' : '#10b981',
+                color: '#fff',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                cursor: webhookLoading ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                boxShadow: webhookLoading ? 'none' : '0 4px 12px rgba(16, 185, 129, 0.4)',
+                flex: '1 1 auto',
+                minWidth: '160px',
+                maxWidth: '240px',
+                justifyContent: 'center'
+              }}
+              onMouseEnter={(e) => {
+                if (!webhookLoading) {
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!webhookLoading) {
+                  e.currentTarget.style.transform = 'scale(1)';
+                }
+              }}
+            >
+              {webhookLoading ? '⏳ Checking...' : '🔄 Check Market'}
+            </button>
+
+            <button
+              onClick={handleLogout}
+              style={{
+                padding: '12px 24px',
+                borderRadius: '8px',
+                border: '2px solid #ef4444',
+                background: 'transparent',
+                color: '#ef4444',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                flex: '0 1 auto',
+                minWidth: '120px'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#ef4444';
+                e.currentTarget.style.color = '#fff';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.color = '#ef4444';
+              }}
+            >
+              Logout
+            </button>
+          </div>
+
+          {/* User Info */}
+          <div style={{ textAlign: 'center', fontSize: '14px', opacity: 0.7 }}>
+            <span>{user.email}</span>
+            <span style={{ margin: '0 8px', color: '#334155' }}>•</span>
+            <span style={{ color: '#3b82f6', fontWeight: 'bold' }}>{user.role}</span>
           </div>
 
           {/* Webhook Status Message */}
@@ -286,8 +302,8 @@ export default function Home() {
 
         {/* Trading Signals */}
         {tradingSignals.length > 0 && (
-          <div style={{ marginBottom: '40px' }}>
-            <h2 style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '20px' }}>
+          <div style={{ marginBottom: '32px' }}>
+            <h2 style={{ fontSize: 'clamp(24px, 5vw, 32px)', fontWeight: 'bold', marginBottom: '16px' }}>
               🎯 Active Trading Signals
             </h2>
             <div style={{
@@ -303,7 +319,7 @@ export default function Home() {
         )}
 
         {/* Warning Box */}
-        <div style={{ marginBottom: '40px' }}>
+        <div style={{ marginBottom: '32px' }}>
           <WarningBox
             level={analysis.warning_level}
             score={analysis.market_health_score?.$numberInt || analysis.market_health_score || 0}
@@ -316,14 +332,14 @@ export default function Home() {
 
         {/* Market Health Chart */}
         {marketData.length > 1 && (
-          <div style={{ marginBottom: '40px' }}>
+          <div style={{ marginBottom: '32px' }}>
             <MarketHealthChart data={marketData} />
           </div>
         )}
 
         {/* Major Indexes */}
-        <div style={{ marginBottom: '40px' }}>
-          <h2 style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '20px' }}>
+        <div style={{ marginBottom: '32px' }}>
+          <h2 style={{ fontSize: 'clamp(24px, 5vw, 32px)', fontWeight: 'bold', marginBottom: '16px' }}>
             Major Indexes
           </h2>
           <div style={{
@@ -349,8 +365,8 @@ export default function Home() {
         </div>
 
         {/* Sectors */}
-        <div style={{ marginBottom: '40px' }}>
-          <h2 style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '20px' }}>
+        <div style={{ marginBottom: '32px' }}>
+          <h2 style={{ fontSize: 'clamp(24px, 5vw, 32px)', fontWeight: 'bold', marginBottom: '16px' }}>
             Sector ETFs
           </h2>
           <div style={{
@@ -376,8 +392,8 @@ export default function Home() {
         </div>
 
         {/* Other Indicators */}
-        <div style={{ marginBottom: '40px' }}>
-          <h2 style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '20px' }}>
+        <div style={{ marginBottom: '32px' }}>
+          <h2 style={{ fontSize: 'clamp(24px, 5vw, 32px)', fontWeight: 'bold', marginBottom: '16px' }}>
             Other Indicators
           </h2>
           <div style={{

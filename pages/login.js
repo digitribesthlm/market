@@ -47,19 +47,19 @@ export default function Login() {
       alignItems: 'center',
       justifyContent: 'center',
       background: 'linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%)',
-      padding: '20px'
+      padding: '16px'
     }}>
       <div style={{
         background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
         border: '2px solid #334155',
         borderRadius: '16px',
-        padding: '40px',
+        padding: '24px',
         maxWidth: '400px',
         width: '100%',
         boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)'
       }}>
         <h1 style={{
-          fontSize: '32px',
+          fontSize: '28px',
           fontWeight: 'bold',
           marginBottom: '8px',
           textAlign: 'center'
@@ -69,7 +69,7 @@ export default function Login() {
         <p style={{
           fontSize: '14px',
           opacity: 0.7,
-          marginBottom: '32px',
+          marginBottom: '24px',
           textAlign: 'center'
         }}>
           Sign in to access your dashboard
