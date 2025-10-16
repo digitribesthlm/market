@@ -41,7 +41,21 @@ export default function TradingSignalCard({ signal }) {
           <h3 style={{ fontSize: '24px', fontWeight: 'bold', margin: 0, marginBottom: '4px' }}>
             {signal.symbol}
           </h3>
-          <p style={{ fontSize: '12px', opacity: 0.6, margin: 0 }}>{timeAgo}</p>
+          <p style={{ fontSize: '12px', opacity: 0.6, margin: 0 }}>
+            {timeAgo}
+            {signal.count > 1 && (
+              <span style={{ 
+                marginLeft: '8px', 
+                background: 'rgba(59, 130, 246, 0.2)', 
+                padding: '2px 6px', 
+                borderRadius: '4px',
+                color: '#3b82f6',
+                fontWeight: 'bold'
+              }}>
+                {signal.count} signals
+              </span>
+            )}
+          </p>
         </div>
         <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#10b981' }}>
           ${(signal.price?.$numberDouble || signal.price || 0).toFixed(2)}

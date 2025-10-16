@@ -385,22 +385,66 @@ export default function Home() {
         </div>
 
         {/* Trading Signals */}
-        {tradingSignals.length > 0 && (
-          <div style={{ marginBottom: '32px' }}>
-            <h2 style={{ fontSize: 'clamp(24px, 5vw, 32px)', fontWeight: 'bold', marginBottom: '16px' }}>
-              🎯 Active Trading Signals
-            </h2>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-              gap: '20px'
-            }}>
-              {tradingSignals.slice(0, 12).map((signal, idx) => (
-                <TradingSignalCard key={idx} signal={signal} />
-              ))}
+        {tradingSignals.length > 0 && (() => {
+          // Group signals by symbol, keeping the most recent one
+          const groupedSignals = tradingSignals.reduce((acc, signal) => {
+            const symbol = signal.symbol;
+            if (!acc[symbol]) {
+              acc[symbol] = {
+                ...signal,
+                allSignals: [...signal.signals],
+                count: 1,
+                timestamps: [signal.timestamp]
+              };
+            } else {
+              // Merge signals and update if this one is newer
+              const existingDate = new Date(acc[symbol].timestamp);
+              const currentDate = new Date(signal.timestamp);
+              
+              // Add all unique signals
+              signal.signals.forEach(sig => {
+                if (!acc[symbol].allSignals.includes(sig)) {
+                  acc[symbol].allSignals.push(sig);
+                }
+              });
+              
+              // Keep the latest price and timestamp
+              if (currentDate > existingDate) {
+                acc[symbol].timestamp = signal.timestamp;
+                acc[symbol].price = signal.price;
+              }
+              
+              acc[symbol].count++;
+              acc[symbol].timestamps.push(signal.timestamp);
+            }
+            return acc;
+          }, {});
+
+          // Convert back to array and sort by most recent
+          const mergedSignals = Object.values(groupedSignals)
+            .map(signal => ({
+              ...signal,
+              signals: signal.allSignals
+            }))
+            .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+          return (
+            <div style={{ marginBottom: '32px' }}>
+              <h2 style={{ fontSize: 'clamp(24px, 5vw, 32px)', fontWeight: 'bold', marginBottom: '16px' }}>
+                🎯 Active Trading Signals ({mergedSignals.length})
+              </h2>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                gap: '20px'
+              }}>
+                {mergedSignals.map((signal, idx) => (
+                  <TradingSignalCard key={signal.symbol} signal={signal} />
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* Warning Box */}
         <div style={{ marginBottom: '32px' }}>
