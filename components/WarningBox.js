@@ -61,3 +61,4 @@ export default function WarningBox({ level, score, emoji, indexWarnings, sectorW
   );
 }
 
+
