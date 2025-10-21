@@ -347,12 +347,15 @@ export default function Home() {
             {tradingSignals.length > 0 && (() => {
               const groupedSignals = tradingSignals.reduce((acc, signal) => {
                 const symbol = signal.symbol;
+                // Ensure signal.signals is always an array
+                const signalsArray = Array.isArray(signal.signals) ? signal.signals : (signal.signals ? [signal.signals] : []);
+                
                 if (!acc[symbol]) {
-                  acc[symbol] = { ...signal, allSignals: [...signal.signals], count: 1, allEntries: [signal] };
+                  acc[symbol] = { ...signal, allSignals: [...signalsArray], count: 1, allEntries: [signal] };
                 } else {
                   const existingDate = new Date(acc[symbol].timestamp);
                   const currentDate = new Date(signal.timestamp);
-                  signal.signals.forEach(sig => {
+                  signalsArray.forEach(sig => {
                     if (!acc[symbol].allSignals.includes(sig)) {
                       acc[symbol].allSignals.push(sig);
                     }

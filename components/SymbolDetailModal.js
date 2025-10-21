@@ -261,3 +261,4 @@ export default function SymbolDetailModal({ symbol, fullName, data, onClose }) {
 }
 
 
+
