@@ -8,6 +8,7 @@ export default function LynchScore() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const [debugInfo, setDebugInfo] = useState(null);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -29,8 +30,13 @@ export default function LynchScore() {
     setLoading(true);
     setError(null);
     setResult(null);
+    setDebugInfo(null);
+
+    const startTime = Date.now();
 
     try {
+      console.log('Sending request to /api/lynch-score with ticker:', ticker);
+      
       // Call our API route instead of directly calling the webhook
       const response = await fetch('/api/lynch-score', {
         method: 'POST',
@@ -42,26 +48,42 @@ export default function LynchScore() {
         })
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-      }
+      const duration = Date.now() - startTime;
+      console.log(`Response received in ${duration}ms`);
 
       const data = await response.json();
+      console.log('Response data:', data);
+
+      if (!response.ok) {
+        const errorMsg = data.error || `HTTP error! status: ${response.status}`;
+        const details = data.details ? ` - ${data.details}` : '';
+        const debugMsg = `Status: ${response.status}, Time: ${duration}ms, Type: ${data.type || 'Unknown'}`;
+        
+        setDebugInfo(debugMsg);
+        throw new Error(errorMsg + details);
+      }
       
       if (data.results && data.results.length > 0) {
         const tickerResult = data.results[0];
         
         if (tickerResult.Error) {
           setError(`Error analyzing ${ticker}: ${tickerResult.Error}`);
+          setDebugInfo(`Time: ${duration}ms, Attempts: ${tickerResult.Attempts || 'unknown'}`);
         } else {
           setResult(tickerResult);
+          setDebugInfo(`Success in ${duration}ms`);
         }
       } else {
         setError('No results returned from analysis');
+        setDebugInfo(`Time: ${duration}ms, Response: ${JSON.stringify(data).substring(0, 100)}`);
       }
     } catch (err) {
+      const duration = Date.now() - startTime;
+      console.error('Error:', err);
       setError(`Failed to analyze ticker: ${err.message}`);
+      if (!debugInfo) {
+        setDebugInfo(`Time: ${duration}ms, Error: ${err.constructor.name}`);
+      }
     } finally {
       setLoading(false);
     }
@@ -134,6 +156,11 @@ export default function LynchScore() {
           {error && (
             <div style={styles.errorBox}>
               <strong>Error:</strong> {error}
+              {debugInfo && (
+                <div style={styles.debugInfo}>
+                  <small>{debugInfo}</small>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -153,6 +180,12 @@ export default function LynchScore() {
         {result && !loading && (
           <div style={styles.card}>
             <h2 style={styles.cardTitle}>Analysis Results</h2>
+            
+            {debugInfo && (
+              <div style={styles.successInfo}>
+                <small>{debugInfo}</small>
+              </div>
+            )}
             
             {/* Company Header */}
             <div style={styles.companyHeader}>
@@ -232,6 +265,7 @@ export default function LynchScore() {
                 setTicker('');
                 setResult(null);
                 setError(null);
+                setDebugInfo(null);
               }}
               style={styles.analyzeAnotherButton}
             >
@@ -357,6 +391,25 @@ const styles = {
     border: '1px solid rgba(255, 68, 68, 0.3)',
     borderRadius: '8px',
     color: '#ff6b6b',
+  },
+  debugInfo: {
+    marginTop: '10px',
+    padding: '8px',
+    background: 'rgba(0, 0, 0, 0.2)',
+    borderRadius: '4px',
+    fontSize: '11px',
+    fontFamily: 'monospace',
+    color: 'rgba(255, 255, 255, 0.6)',
+  },
+  successInfo: {
+    marginBottom: '15px',
+    padding: '8px',
+    background: 'rgba(0, 255, 136, 0.1)',
+    border: '1px solid rgba(0, 255, 136, 0.2)',
+    borderRadius: '4px',
+    fontSize: '11px',
+    fontFamily: 'monospace',
+    color: 'rgba(0, 255, 136, 0.8)',
   },
   loadingContainer: {
     display: 'flex',
