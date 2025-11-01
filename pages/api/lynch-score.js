@@ -34,7 +34,12 @@ export default async function handler(req, res) {
       throw new Error(`Webhook returned status ${response.status}`);
     }
 
-    const data = await response.json();
+    let data = await response.json();
+    
+    // n8n returns an array with one item, extract the first item
+    if (Array.isArray(data) && data.length > 0) {
+      data = data[0];
+    }
     
     // Return the webhook response to the frontend
     return res.status(200).json(data);
