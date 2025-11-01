@@ -283,6 +283,21 @@ export default function Home() {
             </button>
 
             <button
+              onClick={() => router.push('/lynch-score')}
+              style={{
+                padding: '12px 20px', borderRadius: '8px', border: '2px solid #8b5cf6',
+                background: '#8b5cf6', color: '#fff',
+                fontSize: '15px', fontWeight: 'bold', cursor: 'pointer',
+                transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(139, 92, 246, 0.4)',
+                flex: '1 1 auto', minWidth: '140px', maxWidth: '200px', justifyContent: 'center'
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.05)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+            >
+              📈 Lynch Score
+            </button>
+
+            <button
               onClick={handleLogout}
               style={{
                 padding: '12px 24px', borderRadius: '8px', border: '2px solid #ef4444',
