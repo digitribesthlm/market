@@ -31,19 +31,20 @@ export default function LynchScore() {
     setResult(null);
 
     try {
-      const response = await fetch('https://n8n.digitribe.se/webhook/ca4d7670-6bd3-4b84-ac23-3601cb85b3b0', {
+      // Call our API route instead of directly calling the webhook
+      const response = await fetch('/api/lynch-score', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          token: 'tooken',
-          tickers: [ticker.toUpperCase().trim()]
+          ticker: ticker.toUpperCase().trim()
         })
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
