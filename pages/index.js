@@ -7,6 +7,7 @@ import SymbolDetailModal from '../components/SymbolDetailModal';
 import TradingSignalCard from '../components/TradingSignalCard';
 import TabNavigation from '../components/TabNavigation';
 import HoldingsBoxes from '../components/HoldingsBoxes';
+import DivergenceWarnings from '../components/DivergenceWarnings';
 
 export default function Home() {
   const router = useRouter();
@@ -423,6 +424,12 @@ export default function Home() {
                 signals={analysis.warning_signals || []}
               />
             </div>
+
+            {/* 1929-Style Divergence Warnings */}
+            <DivergenceWarnings 
+              detailedResults={detailedResults} 
+              latestData={latestData}
+            />
 
             {/* Market Health Chart */}
             {marketData.length > 1 && (
