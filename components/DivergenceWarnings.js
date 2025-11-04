@@ -18,6 +18,7 @@ export default function DivergenceWarnings({ detailedResults, latestData }) {
   const vix = detailedResults['^VIX'];
   const hyg = detailedResults['HYG'];
   const tlt = detailedResults['TLT'];
+  const gld = detailedResults['GLD'];
   const xlf = detailedResults['XLF'];
   const xlp = detailedResults['XLP'];
   const xlu = detailedResults['XLU'];
@@ -57,7 +58,39 @@ export default function DivergenceWarnings({ detailedResults, latestData }) {
     }
   }
 
-  // 2. Bond-Stock Divergence (Flight to safety during rally)
+  // 2. Gold-Stock Divergence (Smart money hedging with gold)
+  if (gld && spy) {
+    const gldAboveEMA = isAboveEMA(gld);
+    const spyAboveEMA = isAboveEMA(spy);
+    const gldPrice = getPrice(gld);
+    const gldWarnings = getWarningCount(gld);
+    
+    // Gold rising while stocks rise = smart money hedging (1929 pattern)
+    if (gldAboveEMA && spyAboveEMA) {
+      warnings.push({
+        type: 'divergence',
+        severity: 'high',
+        title: '🥇 Gold-Stock Divergence: 1929 Pattern',
+        description: `Gold (${gldPrice.toFixed(2)}) and stocks both rising - smart money accumulating safe havens`,
+        symbol: 'GLD',
+        pattern: '1929'
+      });
+    }
+
+    // Gold showing strength with low warnings while market has warnings
+    if (gldAboveEMA && spy && getWarningCount(spy) > 0 && gldWarnings === 0) {
+      warnings.push({
+        type: 'divergence',
+        severity: 'medium',
+        title: '🏆 Gold Strength During Market Stress',
+        description: `Gold above trend with no warnings while SPY shows ${getWarningCount(spy)} warning(s) - flight to safety`,
+        symbol: 'GLD',
+        pattern: '1929'
+      });
+    }
+  }
+
+  // 3. Bond-Stock Divergence (Flight to safety during rally)
   if (tlt && spy) {
     const tltAboveEMA = isAboveEMA(tlt);
     const spyAboveEMA = isAboveEMA(spy);
@@ -76,7 +109,7 @@ export default function DivergenceWarnings({ detailedResults, latestData }) {
     }
   }
 
-  // 3. Credit Stress (High yield weakness)
+  // 4. Credit Stress (High yield weakness)
   if (hyg && spy) {
     const hygWarnings = getWarningCount(hyg);
     const hygAboveEMA = isAboveEMA(hyg);
@@ -107,7 +140,7 @@ export default function DivergenceWarnings({ detailedResults, latestData }) {
     }
   }
 
-  // 4. Financial Sector Weakness (Banking stocks leading decline)
+  // 5. Financial Sector Weakness (Banking stocks leading decline)
   if (xlf && spy) {
     const xlfWarnings = getWarningCount(xlf);
     const xlfAboveEMA = isAboveEMA(xlf);
@@ -139,7 +172,7 @@ export default function DivergenceWarnings({ detailedResults, latestData }) {
     }
   }
 
-  // 5. Defensive Sector Rotation (Smart money going defensive)
+  // 6. Defensive Sector Rotation (Smart money going defensive)
   if (xlp && xlu && xlv && xlk && xly && xle) {
     const defensiveAboveEMA = [
       isAboveEMA(xlp),
@@ -166,7 +199,7 @@ export default function DivergenceWarnings({ detailedResults, latestData }) {
     }
   }
 
-  // 6. Overbought Market with Warnings (Euphoria with cracks)
+  // 7. Overbought Market with Warnings (Euphoria with cracks)
   if (spy) {
     const spyStoch = getStoch(spy);
     const spyWarnings = getWarningCount(spy);
@@ -184,7 +217,7 @@ export default function DivergenceWarnings({ detailedResults, latestData }) {
     }
   }
 
-  // 7. Multiple Sector Warnings (Broad market deterioration)
+  // 8. Multiple Sector Warnings (Broad market deterioration)
   const sectorSymbols = ['XLC', 'XLE', 'XLF', 'XLI', 'XLK', 'XLP', 'XLU', 'XLV', 'XLY'];
   const sectorsWithWarnings = sectorSymbols.filter(symbol => {
     const data = detailedResults[symbol];

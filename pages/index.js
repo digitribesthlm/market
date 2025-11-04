@@ -214,8 +214,13 @@ export default function Home() {
     'XLK': 'Technology', 'XLP': 'Consumer Staples', 'XLU': 'Utilities', 'XLV': 'Healthcare', 'XLY': 'Consumer Discretionary'
   };
   
-  const others = ['^VIX', 'HYG', 'TLT'];
-  const otherNames = { '^VIX': 'Volatility Index', 'HYG': 'High Yield Bond', 'TLT': '20+ Year Treasury' };
+  const others = ['^VIX', 'HYG', 'TLT', 'GLD'];
+  const otherNames = { 
+    '^VIX': 'Volatility Index', 
+    'HYG': 'High Yield Bond', 
+    'TLT': '20+ Year Treasury',
+    'GLD': 'Gold ETF (1929 Indicator)'
+  };
 
   return (
     <div style={{ minHeight: '100vh', padding: '16px' }}>
